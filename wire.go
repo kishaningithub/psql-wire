@@ -31,6 +31,7 @@ func NewServer(options ...OptionFn) (*Server, error) {
 		logger:     zap.NewNop(),
 		closer:     make(chan struct{}),
 		Statements: &DefaultStatementCache{},
+		Portals:    &DefaultPortalCache{},
 	}
 
 	for _, option := range options {
@@ -128,7 +129,7 @@ func (srv *Server) serve(ctx context.Context, conn net.Conn) error {
 	srv.logger.Debug("handshake successfull, validating authentication")
 
 	writer := buffer.NewWriter(conn)
-	ctx, err = srv.readParameters(ctx, reader)
+	ctx, err = srv.readClientParameters(ctx, reader)
 	if err != nil {
 		return err
 	}
